@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "5"
+# ///
 # MAGIC %md
 # MAGIC # Generate Synthetic Financial Data
 # MAGIC
@@ -19,6 +23,10 @@
 # COMMAND ----------
 
 # MAGIC %pip install dbldatagen --quiet
+
+# COMMAND ----------
+
+dbutils.library.restartPython()
 
 # COMMAND ----------
 
@@ -429,6 +437,27 @@ for d in sorted(os.listdir(VOLUME_PATH)):
 
 # COMMAND ----------
 
+datasets = [
+    "branches",
+    "products",
+    "date_dimensions",
+    "customers",
+    "accounts",
+    "transactions"
+]
+
+for dataset in datasets:
+    path = f"{VOLUME_PATH}/{dataset}"
+    count = (
+        spark.read
+        .option("header", True)
+        .csv(path)
+        .count()
+    )
+    print(f"{dataset}: {count:,} rows")
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ## Summary
 # MAGIC
@@ -451,3 +480,6 @@ for d in sorted(os.listdir(VOLUME_PATH)):
 # MAGIC - `credit_score` -- Credit information
 # MAGIC
 # MAGIC These PII columns can be used to demonstrate PII detection and masking with the Genie Code skills in this repo.
+
+# COMMAND ----------
+
